@@ -51,6 +51,7 @@ import org.cyanogenmod.hardware.ThermalUpdateCallback;
 import org.cyanogenmod.hardware.TouchscreenHovering;
 import org.cyanogenmod.hardware.VibratorHW;
 
+/** @hide */
 public class CMHardwareService extends SystemService implements ThermalUpdateCallback {
 
     private static final boolean DEBUG = true;
@@ -83,6 +84,7 @@ public class CMHardwareService extends SystemService implements ThermalUpdateCal
         public String getSerialNumber();
 
         public boolean requireAdaptiveBacklightForSunlightEnhancement();
+        public boolean isSunlightEnhancementSelfManaged();
 
         public DisplayMode[] getDisplayModes();
         public DisplayMode getCurrentDisplayMode();
@@ -294,6 +296,10 @@ public class CMHardwareService extends SystemService implements ThermalUpdateCal
 
         public boolean requireAdaptiveBacklightForSunlightEnhancement() {
             return SunlightEnhancement.isAdaptiveBacklightRequired();
+        }
+
+        public boolean isSunlightEnhancementSelfManaged() {
+            return SunlightEnhancement.isSelfManaged();
         }
 
         public DisplayMode[] getDisplayModes() {
@@ -525,6 +531,17 @@ public class CMHardwareService extends SystemService implements ThermalUpdateCal
                 return false;
             }
             return mCmHwImpl.requireAdaptiveBacklightForSunlightEnhancement();
+        }
+
+        @Override
+        public boolean isSunlightEnhancementSelfManaged() {
+            mContext.enforceCallingOrSelfPermission(
+                    cyanogenmod.platform.Manifest.permission.HARDWARE_ABSTRACTION_ACCESS, null);
+            if (!isSupported(CMHardwareManager.FEATURE_SUNLIGHT_ENHANCEMENT)) {
+                Log.e(TAG, "Sunlight enhancement is not supported");
+                return false;
+            }
+            return mCmHwImpl.isSunlightEnhancementSelfManaged();
         }
 
         @Override
