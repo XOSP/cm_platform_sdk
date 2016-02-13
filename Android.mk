@@ -283,7 +283,7 @@ LOCAL_SRC_FILES := $(cmplat_docs_src_files)
 LOCAL_ADDITONAL_JAVA_DIR := $(intermediates.COMMON)/src
 
 LOCAL_IS_HOST_MODULE := false
-LOCAL_DROIDDOC_CUSTOM_TEMPLATE_DIR := vendor/reborn/build/tools/droiddoc/templates-cmsdk
+LOCAL_DROIDDOC_CUSTOM_TEMPLATE_DIR := vendor/xosp/build/tools/droiddoc/templates-cmsdk
 LOCAL_ADDITIONAL_DEPENDENCIES := \
     services \
     org.cyanogenmod.hardware
@@ -309,7 +309,7 @@ include $(BUILD_DROIDDOC)
 
 include $(call first-makefiles-under,$(LOCAL_PATH))
 
-# Cleanup temp vars
+# Cleanup temp vars 
 # ===========================================================
 cmplat.docs.src_files :=
 cmplat.docs.java_libraries :=
