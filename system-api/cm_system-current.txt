@@ -223,6 +223,7 @@ package cyanogenmod.app {
     method public int getDozeMode();
     method public int getExpandedDesktopMode();
     method public java.lang.String getName();
+    method public int getNotificationLightMode();
     method public int getProfileType();
     method public cyanogenmod.profiles.RingModeSettings getRingMode();
     method public cyanogenmod.profiles.LockSettings getScreenLockMode();
@@ -240,6 +241,7 @@ package cyanogenmod.app {
     method public void setDozeMode(int);
     method public void setExpandedDesktopMode(int);
     method public void setName(java.lang.String);
+    method public void setNotificationLightMode(int);
     method public void setProfileType(int);
     method public void setRingMode(cyanogenmod.profiles.RingModeSettings);
     method public void setScreenLockMode(cyanogenmod.profiles.LockSettings);
@@ -268,6 +270,13 @@ package cyanogenmod.app {
     field public static final int DEFAULT = 0; // 0x0
     field public static final int DISABLE = 2; // 0x2
     field public static final int INSECURE = 1; // 0x1
+  }
+
+  public static class Profile.NotificationLightMode {
+    ctor public Profile.NotificationLightMode();
+    field public static final int DEFAULT = 0; // 0x0
+    field public static final int DISABLE = 2; // 0x2
+    field public static final int ENABLE = 1; // 0x1
   }
 
   public static class Profile.ProfileTrigger implements android.os.Parcelable {
@@ -533,6 +542,7 @@ package cyanogenmod.os {
     field public static final int BOYSENBERRY = 2; // 0x2
     field public static final int CANTALOUPE = 3; // 0x3
     field public static final int DRAGON_FRUIT = 4; // 0x4
+    field public static final int ELDERBERRY = 5; // 0x5
   }
 
 }
@@ -805,6 +815,7 @@ package cyanogenmod.providers {
     field public static final java.lang.String ENABLE_PEOPLE_LOOKUP = "enable_people_lookup";
     field public static final java.lang.String ENABLE_REVERSE_LOOKUP = "enable_reverse_lookup";
     field public static final java.lang.String FORWARD_LOOKUP_PROVIDER = "forward_lookup_provider";
+    field public static final java.lang.String HEADSET_CONNECT_PLAYER = "headset_connect_player";
     field public static final java.lang.String HIGH_TOUCH_SENSITIVITY_ENABLE = "high_touch_sensitivity_enable";
     field public static final java.lang.String HOME_WAKE_SCREEN = "home_wake_screen";
     field public static final java.lang.String INCREASING_RING = "increasing_ring";
