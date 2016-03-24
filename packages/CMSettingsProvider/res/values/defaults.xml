@@ -56,10 +56,10 @@
          * 2: Display the battery as a circle
          * 4: Hide the battery status information
          * 5: Display the battery as icon in landscape mode
-         * 6: Display the battery as plain text
+         * 6: Display the Prototype Xperia Battery text icon
          * default: 2
          -->
-    <integer name="def_battery_style">2</integer>
+    <integer name="def_battery_style">6</integer>
 
     <!-- Default for CMSettings.Secure.QS_USE_MAIN_TILES -->
     <bool name="def_sysui_qs_main_tiles">true</bool>

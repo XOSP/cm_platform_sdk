@@ -846,8 +846,8 @@ public final class CMSettings {
          * 2: Display the battery as a circle
          * 4: Hide the battery status information
          * 5: Display the battery an icon in landscape mode
-         * 6: Display the battery as plain text
-         * default: 0
+         * 6: Display the Prototype Xperia Battery text icon
+         * default: 6
          */
         public static final String STATUS_BAR_BATTERY_STYLE = "status_bar_battery_style";
 
@@ -866,7 +866,7 @@ public final class CMSettings {
 
         /** @hide */
         public static final Validator STATUS_BAR_SHOW_BATTERY_PERCENT_VALIDATOR =
-                new InclusiveIntegerRangeValidator(0, 2);
+                new InclusiveIntegerRangeValidator(0, 1);
 
         /**
          * Whether the phone ringtone should be played in an increasing manner
