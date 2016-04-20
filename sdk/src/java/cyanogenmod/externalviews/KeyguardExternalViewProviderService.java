@@ -350,27 +350,27 @@ public abstract class KeyguardExternalViewProviderService extends Service {
             // region Window callbacks
             @Override
             public boolean dispatchKeyEvent(KeyEvent event) {
-                return false;
+                return mWindow.superDispatchKeyEvent(event);
             }
 
             @Override
             public boolean dispatchKeyShortcutEvent(KeyEvent event) {
-                return false;
+                return mWindow.superDispatchKeyShortcutEvent(event);
             }
 
             @Override
             public boolean dispatchTouchEvent(MotionEvent event) {
-                return false;
+                return mWindow.superDispatchTouchEvent(event);
             }
 
             @Override
             public boolean dispatchTrackballEvent(MotionEvent event) {
-                return false;
+                return mWindow.superDispatchTrackballEvent(event);
             }
 
             @Override
             public boolean dispatchGenericMotionEvent(MotionEvent event) {
-                return false;
+                return mWindow.superDispatchGenericMotionEvent(event);
             }
 
             @Override
@@ -595,9 +595,12 @@ public abstract class KeyguardExternalViewProviderService extends Service {
          * attention.  The user will still be able to bring the notifications back into view by
          * sliding down from the status bar.
          * Calling this method has no effect for non-interactive components.</p>
+         * @deprecated As of SDK version {@link cyanogenmod.os.Build.CM_VERSION_CODES#ELDERBERRY}
+         * this does nothing.
          */
+        @Deprecated
         protected final void collapseNotificationPanel() {
-            mImpl.collapseNotificationPanel();
+            /* do nothing */
         }
 
         /**

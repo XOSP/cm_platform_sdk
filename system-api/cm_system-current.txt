@@ -427,7 +427,7 @@ package cyanogenmod.externalviews {
 
   protected abstract class KeyguardExternalViewProviderService.Provider {
     ctor protected KeyguardExternalViewProviderService.Provider(android.os.Bundle);
-    method protected final void collapseNotificationPanel();
+    method protected final deprecated void collapseNotificationPanel();
     method protected android.os.Bundle getOptions();
     method protected void onAttach();
     method protected abstract void onBouncerShowing(boolean);
@@ -529,6 +529,54 @@ package cyanogenmod.hardware {
     method public boolean onTransact(int, android.os.Parcel, android.os.Parcel, int) throws android.os.RemoteException;
   }
 
+  public class LiveDisplayConfig implements android.os.Parcelable {
+    ctor public LiveDisplayConfig(java.util.BitSet, int, int, int, boolean, boolean, boolean, boolean);
+    method public int describeContents();
+    method public boolean getDefaultAutoContrast();
+    method public boolean getDefaultAutoOutdoorMode();
+    method public boolean getDefaultCABC();
+    method public boolean getDefaultColorEnhancement();
+    method public int getDefaultDayTemperature();
+    method public int getDefaultMode();
+    method public int getDefaultNightTemperature();
+    method public boolean hasFeature(int);
+    method public boolean hasModeSupport();
+    method public boolean isAvailable();
+    method public void writeToParcel(android.os.Parcel, int);
+  }
+
+  public class LiveDisplayManager {
+    method public float[] getColorAdjustment();
+    method public cyanogenmod.hardware.LiveDisplayConfig getConfig();
+    method public int getDayColorTemperature();
+    method public static synchronized cyanogenmod.hardware.LiveDisplayManager getInstance(android.content.Context);
+    method public int getMode();
+    method public int getNightColorTemperature();
+    method public boolean isAutoContrastEnabled();
+    method public boolean isAutomaticOutdoorModeEnabled();
+    method public boolean isCABCEnabled();
+    method public boolean isColorEnhancementEnabled();
+    method public boolean setAutoContrastEnabled(boolean);
+    method public boolean setAutomaticOutdoorModeEnabled(boolean);
+    method public boolean setCABCEnabled(boolean);
+    method public boolean setColorAdjustment(float[]);
+    method public boolean setColorEnhancementEnabled(boolean);
+    method public boolean setDayColorTemperature(int);
+    method public boolean setMode(int);
+    method public boolean setNightColorTemperature(int);
+    field public static final int FEATURE_AUTO_CONTRAST = 11; // 0xb
+    field public static final int FEATURE_CABC = 10; // 0xa
+    field public static final int FEATURE_COLOR_ADJUSTMENT = 13; // 0xd
+    field public static final int FEATURE_COLOR_ENHANCEMENT = 12; // 0xc
+    field public static final int FEATURE_DISPLAY_MODES = 15; // 0xf
+    field public static final int FEATURE_MANAGED_OUTDOOR_MODE = 14; // 0xe
+    field public static final int MODE_AUTO = 2; // 0x2
+    field public static final int MODE_DAY = 4; // 0x4
+    field public static final int MODE_NIGHT = 1; // 0x1
+    field public static final int MODE_OFF = 0; // 0x0
+    field public static final int MODE_OUTDOOR = 3; // 0x3
+  }
+
   public abstract class ThermalListenerCallback extends cyanogenmod.hardware.IThermalListenerCallback.Stub {
     ctor public ThermalListenerCallback();
   }
@@ -613,6 +661,7 @@ package cyanogenmod.platform {
     field public static final java.lang.String HARDWARE_ABSTRACTION_ACCESS = "cyanogenmod.permission.HARDWARE_ABSTRACTION_ACCESS";
     field public static final java.lang.String LIVE_LOCK_SCREEN_MANAGER_ACCESS = "cyanogenmod.permission.LIVE_LOCK_SCREEN_MANAGER_ACCESS";
     field public static final java.lang.String MANAGE_ALARMS = "cyanogenmod.permission.MANAGE_ALARMS";
+    field public static final java.lang.String MANAGE_LIVEDISPLAY = "cyanogenmod.permission.MANAGE_LIVEDISPLAY";
     field public static final java.lang.String MANAGE_PERSISTENT_STORAGE = "cyanogenmod.permission.MANAGE_PERSISTENT_STORAGE";
     field public static final java.lang.String MODIFY_MSIM_PHONE_STATE = "cyanogenmod.permission.MODIFY_MSIM_PHONE_STATE";
     field public static final java.lang.String MODIFY_NETWORK_SETTINGS = "cyanogenmod.permission.MODIFY_NETWORK_SETTINGS";
@@ -626,7 +675,7 @@ package cyanogenmod.platform {
     field public static final java.lang.String READ_MSIM_PHONE_STATE = "cyanogenmod.permission.READ_MSIM_PHONE_STATE";
     field public static final java.lang.String READ_THEMES = "cyanogenmod.permission.READ_THEMES";
     field public static final java.lang.String READ_WEATHER = "cyanogenmod.permission.READ_WEATHER";
-    field public static final java.lang.String THIRD_PARTY_KEYGUARD = "android.permission.THIRD_PARTY_KEYGUARD";
+    field public static final java.lang.String THIRD_PARTY_KEYGUARD = "cyanogenmod.permission.THIRD_PARTY_KEYGUARD";
     field public static final java.lang.String WRITE_ALARMS = "cyanogenmod.permission.WRITE_ALARMS";
     field public static final java.lang.String WRITE_DATAUSAGE = "cyanogenmod.permission.WRITE_DATAUSAGE";
     field public static final java.lang.String WRITE_SECURE_SETTINGS = "cyanogenmod.permission.WRITE_SECURE_SETTINGS";
@@ -795,6 +844,7 @@ package cyanogenmod.providers {
   public final class CMSettings {
     ctor public CMSettings();
     field public static final java.lang.String ACTION_DATA_USAGE = "cyanogenmod.settings.ACTION_DATA_USAGE";
+    field public static final java.lang.String ACTION_LIVEDISPLAY_SETTINGS = "cyanogenmod.settings.LIVEDISPLAY_SETTINGS";
     field public static final java.lang.String AUTHORITY = "cmsettings";
   }
 
@@ -818,6 +868,7 @@ package cyanogenmod.providers {
     method public static boolean putString(android.content.ContentResolver, java.lang.String, java.lang.String);
     field public static final android.net.Uri CONTENT_URI;
     field public static final java.lang.String SYS_PROP_CM_SETTING_VERSION = "sys.cm_settings_global_version";
+    field public static final java.lang.String WEATHER_TEMPERATURE_UNIT = "weather_temperature_unit";
   }
 
   public static final class CMSettings.Secure extends android.provider.Settings.NameValueTable {
@@ -868,10 +919,12 @@ package cyanogenmod.providers {
     field public static final android.net.Uri CONTENT_URI;
     field public static final java.lang.String DIALER_OPENCNAM_ACCOUNT_SID = "dialer_opencnam_account_sid";
     field public static final java.lang.String DIALER_OPENCNAM_AUTH_TOKEN = "dialer_opencnam_auth_token";
+    field public static final java.lang.String DISPLAY_AUTO_CONTRAST = "display_auto_contrast";
     field public static final java.lang.String DISPLAY_AUTO_OUTDOOR_MODE = "display_auto_outdoor_mode";
+    field public static final java.lang.String DISPLAY_CABC = "display_low_power";
     field public static final java.lang.String DISPLAY_COLOR_ADJUSTMENT = "display_color_adjustment";
     field public static final java.lang.String DISPLAY_COLOR_ENHANCE = "display_color_enhance";
-    field public static final java.lang.String DISPLAY_LOW_POWER = "display_low_power";
+    field public static final deprecated java.lang.String DISPLAY_LOW_POWER = "display_low_power";
     field public static final java.lang.String DISPLAY_TEMPERATURE_DAY = "display_temperature_day";
     field public static final java.lang.String DISPLAY_TEMPERATURE_MODE = "display_temperature_mode";
     field public static final java.lang.String DISPLAY_TEMPERATURE_NIGHT = "display_temperature_night";
@@ -1300,22 +1353,26 @@ package cyanogenmod.util {
 package cyanogenmod.weather {
 
   public class CMWeatherManager {
-    method public void cancelRequest(cyanogenmod.weather.RequestInfo);
+    method public void cancelRequest(int);
     method public java.lang.String getActiveWeatherServiceProviderLabel();
     method public static cyanogenmod.weather.CMWeatherManager getInstance(android.content.Context);
-    method public cyanogenmod.weather.RequestInfo lookupCity(java.lang.String, cyanogenmod.weather.CMWeatherManager.LookupCityRequestListener);
+    method public int lookupCity(java.lang.String, cyanogenmod.weather.CMWeatherManager.LookupCityRequestListener);
     method public void registerWeatherServiceProviderChangeListener(cyanogenmod.weather.CMWeatherManager.WeatherServiceProviderChangeListener);
-    method public cyanogenmod.weather.RequestInfo requestWeatherUpdate(android.location.Location, cyanogenmod.weather.CMWeatherManager.WeatherUpdateRequestListener);
-    method public cyanogenmod.weather.RequestInfo requestWeatherUpdate(cyanogenmod.weather.WeatherLocation, cyanogenmod.weather.CMWeatherManager.WeatherUpdateRequestListener);
+    method public int requestWeatherUpdate(android.location.Location, cyanogenmod.weather.CMWeatherManager.WeatherUpdateRequestListener);
+    method public int requestWeatherUpdate(cyanogenmod.weather.WeatherLocation, cyanogenmod.weather.CMWeatherManager.WeatherUpdateRequestListener);
     method public void unregisterWeatherServiceProviderChangeListener(cyanogenmod.weather.CMWeatherManager.WeatherServiceProviderChangeListener);
-    field public static final int WEATHER_REQUEST_ALREADY_IN_PROGRESS = -3; // 0xfffffffd
-    field public static final int WEATHER_REQUEST_COMPLETED = 1; // 0x1
-    field public static final int WEATHER_REQUEST_FAILED = -2; // 0xfffffffe
-    field public static final int WEATHER_REQUEST_SUBMITTED_TOO_SOON = -1; // 0xffffffff
   }
 
   public static abstract interface CMWeatherManager.LookupCityRequestListener {
-    method public abstract void onLookupCityRequestCompleted(java.util.ArrayList<cyanogenmod.weather.WeatherLocation>);
+    method public abstract void onLookupCityRequestCompleted(int, java.util.List<cyanogenmod.weather.WeatherLocation>);
+  }
+
+  public static final class CMWeatherManager.RequestStatus {
+    field public static final int ALREADY_IN_PROGRESS = -3; // 0xfffffffd
+    field public static final int COMPLETED = 1; // 0x1
+    field public static final int FAILED = -1; // 0xffffffff
+    field public static final int NO_MATCH_FOUND = -4; // 0xfffffffc
+    field public static final int SUBMITTED_TOO_SOON = -2; // 0xfffffffe
   }
 
   public static abstract interface CMWeatherManager.WeatherServiceProviderChangeListener {
@@ -1344,7 +1401,7 @@ package cyanogenmod.weather {
     method public int describeContents();
     method public java.lang.String getCity();
     method public int getConditionCode();
-    method public java.util.ArrayList<cyanogenmod.weather.WeatherInfo.DayForecast> getForecasts();
+    method public java.util.List<cyanogenmod.weather.WeatherInfo.DayForecast> getForecasts();
     method public double getHumidity();
     method public double getTemperature();
     method public int getTemperatureUnit();
@@ -1361,7 +1418,7 @@ package cyanogenmod.weather {
   public static class WeatherInfo.Builder {
     ctor public WeatherInfo.Builder(java.lang.String, double, int);
     method public cyanogenmod.weather.WeatherInfo build();
-    method public cyanogenmod.weather.WeatherInfo.Builder setForecast(java.util.ArrayList<cyanogenmod.weather.WeatherInfo.DayForecast>);
+    method public cyanogenmod.weather.WeatherInfo.Builder setForecast(java.util.List<cyanogenmod.weather.WeatherInfo.DayForecast>);
     method public cyanogenmod.weather.WeatherInfo.Builder setHumidity(double);
     method public cyanogenmod.weather.WeatherInfo.Builder setTimestamp(long);
     method public cyanogenmod.weather.WeatherInfo.Builder setTodaysHigh(double);
@@ -1400,8 +1457,10 @@ package cyanogenmod.weather {
 
   public static class WeatherLocation.Builder {
     ctor public WeatherLocation.Builder(java.lang.String, java.lang.String);
+    ctor public WeatherLocation.Builder(java.lang.String);
     method public cyanogenmod.weather.WeatherLocation build();
-    method public cyanogenmod.weather.WeatherLocation.Builder setCountry(java.lang.String, java.lang.String);
+    method public cyanogenmod.weather.WeatherLocation.Builder setCountry(java.lang.String);
+    method public cyanogenmod.weather.WeatherLocation.Builder setCountryId(java.lang.String);
     method public cyanogenmod.weather.WeatherLocation.Builder setPostalCode(java.lang.String);
     method public cyanogenmod.weather.WeatherLocation.Builder setState(java.lang.String);
   }
@@ -1414,11 +1473,12 @@ package cyanogenmod.weatherservice {
     method public void complete(cyanogenmod.weatherservice.ServiceRequestResult);
     method public void fail();
     method public cyanogenmod.weather.RequestInfo getRequestInfo();
+    method public void reject(int);
   }
 
   public final class ServiceRequestResult implements android.os.Parcelable {
     method public int describeContents();
-    method public java.util.ArrayList<cyanogenmod.weather.WeatherLocation> getLocationLookupList();
+    method public java.util.List<cyanogenmod.weather.WeatherLocation> getLocationLookupList();
     method public cyanogenmod.weather.WeatherInfo getWeatherInfo();
     method public void writeToParcel(android.os.Parcel, int);
     field public static final android.os.Parcelable.Creator<cyanogenmod.weatherservice.ServiceRequestResult> CREATOR;
@@ -1426,9 +1486,9 @@ package cyanogenmod.weatherservice {
 
   public static class ServiceRequestResult.Builder {
     ctor public ServiceRequestResult.Builder();
+    ctor public ServiceRequestResult.Builder(cyanogenmod.weather.WeatherInfo);
+    ctor public ServiceRequestResult.Builder(java.util.List<cyanogenmod.weather.WeatherLocation>);
     method public cyanogenmod.weatherservice.ServiceRequestResult build();
-    method public cyanogenmod.weatherservice.ServiceRequestResult.Builder setLocationLookupList(java.util.ArrayList<cyanogenmod.weather.WeatherLocation>);
-    method public cyanogenmod.weatherservice.ServiceRequestResult.Builder setWeatherInfo(cyanogenmod.weather.WeatherInfo);
   }
 
   public abstract class WeatherProviderService extends android.app.Service {
