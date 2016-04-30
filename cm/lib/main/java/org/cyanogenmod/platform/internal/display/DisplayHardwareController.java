@@ -25,6 +25,7 @@ import android.os.IBinder;
 import android.os.Parcel;
 import android.os.RemoteException;
 import android.os.ServiceManager;
+import android.util.MathUtils;
 import android.util.Slog;
 import android.view.animation.LinearInterpolator;
 
@@ -46,6 +47,7 @@ public class DisplayHardwareController extends LiveDisplayFeature {
     private final boolean mUseColorAdjustment;
     private final boolean mUseColorEnhancement;
     private final boolean mUseCABC;
+    private final boolean mUseDisplayModes;
 
     // default values
     private final boolean mDefaultAutoContrast;
@@ -57,7 +59,6 @@ public class DisplayHardwareController extends LiveDisplayFeature {
     private final float[] mColorAdjustment = getDefaultAdjustment();
 
     private ValueAnimator mAnimator;
-    private boolean mDirty = false;
 
     private final int mMaxColor;
 
@@ -92,7 +93,16 @@ public class DisplayHardwareController extends LiveDisplayFeature {
 
         mUseColorAdjustment = mHardware
                 .isSupported(CMHardwareManager.FEATURE_DISPLAY_COLOR_CALIBRATION);
-        mMaxColor = mHardware.getDisplayColorCalibrationMax();
+
+        mUseDisplayModes = mHardware
+                .isSupported(CMHardwareManager.FEATURE_DISPLAY_MODES);
+
+        if (mUseColorAdjustment) {
+            mMaxColor = mHardware.getDisplayColorCalibrationMax();
+            copyColors(getColorAdjustment(), mColorAdjustment);
+        } else {
+            mMaxColor = 0;
+        }
     }
 
     @Override
@@ -133,7 +143,11 @@ public class DisplayHardwareController extends LiveDisplayFeature {
         if (mUseColorAdjustment) {
             caps.set(LiveDisplayManager.FEATURE_COLOR_ADJUSTMENT);
         }
-        return mUseAutoContrast || mUseColorEnhancement || mUseCABC || mUseColorAdjustment;
+        if (mUseDisplayModes) {
+            caps.set(LiveDisplayManager.FEATURE_DISPLAY_MODES);
+        }
+        return mUseAutoContrast || mUseColorEnhancement || mUseCABC || mUseColorAdjustment ||
+            mUseDisplayModes;
     }
 
     @Override
@@ -147,9 +161,8 @@ public class DisplayHardwareController extends LiveDisplayFeature {
         if (uri == null || uri.equals(DISPLAY_COLOR_ENHANCE)) {
             updateColorEnhancement();
         }
-        if (uri == null || uri.equals(DISPLAY_COLOR_ADJUSTMENT) &&
-                parseColorAdjustment(getString(
-                    CMSettings.System.DISPLAY_COLOR_ADJUSTMENT), mColorAdjustment)) {
+        if (uri == null || uri.equals(DISPLAY_COLOR_ADJUSTMENT)) {
+            copyColors(getColorAdjustment(), mColorAdjustment);
             updateColorAdjustment();
         }
     }
@@ -172,10 +185,8 @@ public class DisplayHardwareController extends LiveDisplayFeature {
         if (mUseColorAdjustment) {
             if (mAnimator != null && mAnimator.isRunning() && !isScreenOn()) {
                 mAnimator.cancel();
-                mDirty = true;
-            } else if (mDirty && isScreenOn()) {
+            } else if (isScreenOn()) {
                 updateColorAdjustment();
-                mDirty = false;
             }
         }
     }
@@ -188,6 +199,7 @@ public class DisplayHardwareController extends LiveDisplayFeature {
         pw.println("  mUseColorAdjustment=" + mUseColorAdjustment);
         pw.println("  mUseColorEnhancement="  + mUseColorEnhancement);
         pw.println("  mUseCABC=" + mUseCABC);
+        pw.println("  mUseDisplayModes=" + mUseDisplayModes);
         pw.println();
         pw.println("  DisplayHardwareController State:");
         pw.println("    mAutoContrast=" + isAutoContrastEnabled());
@@ -239,10 +251,10 @@ public class DisplayHardwareController extends LiveDisplayFeature {
         final float[] rgb = getDefaultAdjustment();
 
         if (!isLowPowerMode()) {
-            System.arraycopy(mAdditionalAdjustment, 0, rgb, 0, 3);
-            rgb[0] *= mColorAdjustment[0];
-            rgb[1] *= mColorAdjustment[1];
-            rgb[2] *= mColorAdjustment[2];
+            copyColors(mColorAdjustment, rgb);
+            rgb[0] *= mAdditionalAdjustment[0];
+            rgb[1] *= mAdditionalAdjustment[1];
+            rgb[2] *= mAdditionalAdjustment[2];
         }
 
         if (DEBUG) {
@@ -296,12 +308,15 @@ public class DisplayHardwareController extends LiveDisplayFeature {
             @Override
             public void onAnimationUpdate(final ValueAnimator animation) {
                 synchronized (DisplayHardwareController.this) {
-                    float[] value = (float[])animation.getAnimatedValue();
-                    mHardware.setDisplayColorCalibration(new int[] {
-                            (int)(value[0] * mMaxColor),
-                            (int)(value[1] * mMaxColor),
-                            (int)(value[2] * mMaxColor) });
-                    screenRefresh();
+                    if (isScreenOn()) {
+                        float[] value = (float[]) animation.getAnimatedValue();
+                        mHardware.setDisplayColorCalibration(new int[] {
+                                (int) (value[0] * mMaxColor),
+                                (int) (value[1] * mMaxColor),
+                                (int) (value[2] * mMaxColor)
+                        });
+                        screenRefresh();
+                    }
                 }
             }
         });
@@ -333,20 +348,14 @@ public class DisplayHardwareController extends LiveDisplayFeature {
      * @return true if valid
      */
     private boolean validateColors(float[] colors) {
-        if (colors != null && colors.length == 3 &&
-                !(colors[0] <= 0.0f && colors[1] <= 0.0f && colors[2] <= 0.0f)) {
-            for (int i = 0; i < 3; i++) {
-                if (colors[i] > 1.0f) {
-                    colors[i] = 1.0f;
-                }
-            }
-            return true;
+        if (colors == null || colors.length != 3) {
+            return false;
         }
 
-        colors[0] = 1.0f;
-        colors[1] = 1.0f;
-        colors[2] = 1.0f;
-        return false;
+        for (int i = 0; i < 3; i++) {
+            colors[i] = MathUtils.constrain(colors[i], 0.0f, 1.0f);
+        }
+        return true;
     }
 
     /**
@@ -388,7 +397,7 @@ public class DisplayHardwareController extends LiveDisplayFeature {
 
         // Sanity check this so we don't mangle the display
         if (validateColors(adj)) {
-            System.arraycopy(adj, 0, mAdditionalAdjustment, 0, 3);
+            copyColors(adj, mAdditionalAdjustment);
             updateColorAdjustment();
             return true;
         }
@@ -481,5 +490,13 @@ public class DisplayHardwareController extends LiveDisplayFeature {
 
     private static float[] getDefaultAdjustment() {
         return new float[] { 1.0f, 1.0f, 1.0f };
+    }
+
+    private void copyColors(float[] src, float[] dst) {
+        if (src != null && dst != null && src.length == 3 && dst.length == 3) {
+            dst[0] = src[0];
+            dst[1] = src[1];
+            dst[2] = src[2];
+        }
     }
 }
