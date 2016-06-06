@@ -92,7 +92,7 @@ import static cyanogenmod.platform.Manifest.permission.ACCESS_THEME_MANAGER;
 import static org.cyanogenmod.internal.util.ThemeUtils.SYSTEM_THEME_PATH;
 import static org.cyanogenmod.internal.util.ThemeUtils.THEME_BOOTANIMATION_PATH;
 
-public class ThemeManagerService extends SystemService {
+public class ThemeManagerService extends CMSystemService {
 
     private static final String TAG = ThemeManagerService.class.getName();
 
@@ -242,13 +242,13 @@ public class ThemeManagerService extends SystemService {
     }
 
     @Override
+    public String getFeatureDeclaration() {
+        return CMContextConstants.Features.THEMES;
+    }
+
+    @Override
     public void onStart() {
-        if (mContext.getPackageManager().hasSystemFeature(CMContextConstants.Features.THEMES)) {
-            publishBinderService(CMContextConstants.CM_THEME_SERVICE, mService);
-        } else {
-            Log.wtf(TAG, "Theme service started by system server but feature xml not" +
-                    " declared. Not publishing binder service!");
-        }
+        publishBinderService(CMContextConstants.CM_THEME_SERVICE, mService);
         // listen for wallpaper changes
         IntentFilter filter = new IntentFilter(Intent.ACTION_WALLPAPER_CHANGED);
         mContext.registerReceiver(mWallpaperChangeReceiver, filter);
@@ -632,7 +632,7 @@ public class ThemeManagerService extends SystemService {
     private boolean updateAudible(String dirPath, String assetPath, int type, String pkgName) {
         //Clear the dir
         ThemeUtils.clearAudibles(mContext, dirPath);
-        if (pkgName.equals(SYSTEM_DEFAULT)) {
+        if (TextUtils.isEmpty(pkgName) || pkgName.equals(SYSTEM_DEFAULT)) {
             if (!ThemeUtils.setDefaultAudible(mContext, type)) {
                 Log.e(TAG, "There was an error installing the default audio file");
                 return false;
