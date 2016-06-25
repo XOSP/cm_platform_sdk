@@ -1725,28 +1725,6 @@ public final class CMSettings {
         public static final String NOTIFICATION_LIGHT_PULSE_CUSTOM_VALUES =
                 "notification_light_pulse_custom_values";
 
-        /**
-         * Allows setting the radius for statusbar blur
-         * @hide
-         */
-        public static final String STATUSBAR_BLUR_RADIUS = 
-				"statusbar_blur_radius";
-
-        /** @hide */
-        public static final Validator STATUSBAR_BLUR_RADIUS_VALIDATOR =
-                new InclusiveIntegerRangeValidator(0, 25);
-
-        /**
-         * Allows setting the scale for statusbar blur
-         * @hide
-         */
-        public static final String STATUSBAR_BLUR_SCALE = 
-				"statusbar_blur_scale";
-
-        /** @hide */
-        public static final Validator STATUSBAR_BLUR_SCALE_VALIDATOR =
-                new InclusiveIntegerRangeValidator(0, 25);
-
         /** @hide */
         public static final Validator NOTIFICATION_LIGHT_PULSE_CUSTOM_VALUES_VALIDATOR =
                 new Validator() {
@@ -2109,8 +2087,6 @@ public final class CMSettings {
                     TOUCHSCREEN_GESTURE_HAPTIC_FEEDBACK_VALIDATOR);
             VALIDATORS.put(__MAGICAL_TEST_PASSING_ENABLER,
                     __MAGICAL_TEST_PASSING_ENABLER_VALIDATOR);
-            VALIDATORS.put(STATUSBAR_BLUR_RADIUS, STATUSBAR_BLUR_RADIUS_VALIDATOR);
-            VALIDATORS.put(STATUSBAR_BLUR_SCALE, STATUSBAR_BLUR_SCALE_VALIDATOR);
         };
         // endregion
     }
