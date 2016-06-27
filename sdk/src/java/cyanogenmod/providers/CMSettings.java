@@ -879,7 +879,10 @@ public final class CMSettings {
 
         /**
          * Display style of the status bar battery information
+         * 0: Display the battery an icon in portrait mode
+         * 2: Display the battery as a circle
          * 4: Hide the battery status information
+         * 5: Display the battery an icon in landscape mode
          * 6: Display the Prototype Xperia Battery text icon
          * default: 6
          */
@@ -887,7 +890,7 @@ public final class CMSettings {
 
         /** @hide */
         public static final Validator STATUS_BAR_BATTERY_STYLE_VALIDATOR =
-                new DiscreteValueValidator(new String[] {"4", "6"});
+                new DiscreteValueValidator(new String[] {"0", "2", "4", "5", "6"});
 
         /**
          * Status bar battery %

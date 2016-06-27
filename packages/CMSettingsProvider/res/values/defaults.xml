@@ -52,9 +52,12 @@
     <bool name="def_stats_collection">false</bool>
 
     <!-- Default for CMSettings.System.STATUS_BAR_BATTERY_STYLE
+         * 0: Display the battery as icon in portrait mode
+         * 2: Display the battery as a circle
          * 4: Hide the battery status information
+         * 5: Display the battery as icon in landscape mode
          * 6: Display the Prototype Xperia Battery text icon
-         * default: 6
+         * default: 2
          -->
     <integer name="def_battery_style">6</integer>
 
