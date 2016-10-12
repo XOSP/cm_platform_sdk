@@ -23,9 +23,11 @@ import android.util.Log;
 import android.util.Range;
 
 import cyanogenmod.app.CMContextConstants;
+import cyanogenmod.hardware.HSIC;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.IllegalArgumentException;
+import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
@@ -135,6 +137,12 @@ public final class CMHardwareManager {
      */
     public static final int FEATURE_COLOR_BALANCE = 0x20000;
 
+    /**
+     * HSIC picture adjustment
+     */
+    public static final int FEATURE_PICTURE_ADJUSTMENT = 0x40000;
+
+
     private static final List<Integer> BOOLEAN_FEATURES = Arrays.asList(
         FEATURE_ADAPTIVE_BACKLIGHT,
         FEATURE_COLOR_ENHANCEMENT,
@@ -218,6 +226,26 @@ public final class CMHardwareManager {
         return feature == (getSupportedFeatures() & feature);
     }
 
+    /**
+     * String version for preference constraints
+     *
+     * @hide
+     */
+    public boolean isSupported(String feature) {
+        if (!feature.startsWith("FEATURE_")) {
+            return false;
+        }
+        try {
+            Field f = getClass().getField(feature);
+            if (f != null) {
+                return isSupported((int) f.get(null));
+            }
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            // ignore
+        }
+
+        return false;
+    }
     /**
      * Determine if the given feature is enabled or disabled.
      *
@@ -809,6 +837,9 @@ public final class CMHardwareManager {
         return false;
     }
 
+    /**
+     * @return the available range for color temperature adjustments
+     */
     public Range<Integer> getColorBalanceRange() {
         int min = 0;
         int max = 0;
@@ -822,6 +853,9 @@ public final class CMHardwareManager {
         return new Range<Integer>(min, max);
     }
 
+    /**
+     * @return the current color balance value
+     */
     public int getColorBalance() {
         try {
             if (checkService()) {
@@ -832,6 +866,13 @@ public final class CMHardwareManager {
         return 0;
     }
 
+    /**
+     * Sets the desired color balance. Must fall within the range obtained from
+     * getColorBalanceRange()
+     *
+     * @param value
+     * @return true if success
+     */
     public boolean setColorBalance(int value) {
         try {
             if (checkService()) {
@@ -840,6 +881,76 @@ public final class CMHardwareManager {
         } catch (RemoteException e) {
         }
         return false;
+    }
+
+    /**
+     * Gets the current picture adjustment values
+     *
+     * @return HSIC object with current settings
+     */
+    public HSIC getPictureAdjustment() {
+        try {
+            if (checkService()) {
+                return sService.getPictureAdjustment();
+            }
+        } catch (RemoteException e) {
+        }
+        return null;
+    }
+
+    /**
+     * Gets the default picture adjustment for the current mode
+     *
+     * @return HSIC object with default settings
+     */
+    public HSIC getDefaultPictureAdjustment() {
+        try {
+            if (checkService()) {
+                return sService.getDefaultPictureAdjustment();
+            }
+        } catch (RemoteException e) {
+        }
+        return null;
+    }
+
+    /**
+     * Sets the desired hue/saturation/intensity/contrast
+     *
+     * @param hsic
+     * @return true if success
+     */
+    public boolean setPictureAdjustment(final HSIC hsic) {
+        try {
+            if (checkService()) {
+                return sService.setPictureAdjustment(hsic);
+            }
+        } catch (RemoteException e) {
+        }
+        return false;
+    }
+
+    /**
+     * Get a list of ranges valid for picture adjustment.
+     *
+     * @return range list
+     */
+    public List<Range<Float>> getPictureAdjustmentRanges() {
+        try {
+            if (checkService()) {
+                float[] ranges = sService.getPictureAdjustmentRanges();
+                if (ranges.length > 7) {
+                    return Arrays.asList(new Range<Float>(ranges[0], ranges[1]),
+                            new Range<Float>(ranges[2], ranges[3]),
+                            new Range<Float>(ranges[4], ranges[5]),
+                            new Range<Float>(ranges[6], ranges[7]),
+                            (ranges.length > 9 ?
+                                    new Range<Float>(ranges[8], ranges[9]) :
+                                    new Range<Float>(0.0f, 0.0f)));
+                }
+            }
+        } catch (RemoteException e) {
+        }
+        return null;
     }
 
     /**

@@ -455,6 +455,7 @@ package cyanogenmod.hardware {
     method public android.util.Range<java.lang.Integer> getColorBalanceRange();
     method public cyanogenmod.hardware.DisplayMode getCurrentDisplayMode();
     method public cyanogenmod.hardware.DisplayMode getDefaultDisplayMode();
+    method public cyanogenmod.hardware.HSIC getDefaultPictureAdjustment();
     method public int[] getDisplayColorCalibration();
     method public int getDisplayColorCalibrationDefault();
     method public int getDisplayColorCalibrationMax();
@@ -468,6 +469,8 @@ package cyanogenmod.hardware {
     method public long getLtoDownloadInterval();
     method public java.lang.String getLtoSource();
     method public deprecated int getNumGammaControls();
+    method public cyanogenmod.hardware.HSIC getPictureAdjustment();
+    method public java.util.List<android.util.Range<java.lang.Float>> getPictureAdjustmentRanges();
     method public java.lang.String getSerialNumber();
     method public int getSupportedFeatures();
     method public int getThermalState();
@@ -489,6 +492,7 @@ package cyanogenmod.hardware {
     method public boolean setDisplayColorCalibration(int[]);
     method public deprecated boolean setDisplayGammaCalibration(int, int[]);
     method public boolean setDisplayMode(cyanogenmod.hardware.DisplayMode, boolean);
+    method public boolean setPictureAdjustment(cyanogenmod.hardware.HSIC);
     method public boolean setVibratorIntensity(int);
     method public boolean unRegisterThermalListener(cyanogenmod.hardware.ThermalListenerCallback);
     method public boolean writePersistentBytes(java.lang.String, byte[]);
@@ -505,6 +509,7 @@ package cyanogenmod.hardware {
     field public static final int FEATURE_KEY_DISABLE = 32; // 0x20
     field public static final int FEATURE_LONG_TERM_ORBITS = 64; // 0x40
     field public static final int FEATURE_PERSISTENT_STORAGE = 16384; // 0x4000
+    field public static final int FEATURE_PICTURE_ADJUSTMENT = 262144; // 0x40000
     field public static final int FEATURE_SERIAL_NUMBER = 128; // 0x80
     field public static final int FEATURE_SUNLIGHT_ENHANCEMENT = 256; // 0x100
     field public static final int FEATURE_TAP_TO_WAKE = 512; // 0x200
@@ -522,6 +527,22 @@ package cyanogenmod.hardware {
     field public final java.lang.String name;
   }
 
+  public class HSIC implements android.os.Parcelable {
+    ctor public HSIC(float, float, float, float, float);
+    method public int describeContents();
+    method public java.lang.String flatten();
+    method public static cyanogenmod.hardware.HSIC fromFloatArray(float[]);
+    method public float getContrast();
+    method public float getHue();
+    method public float getIntensity();
+    method public float getSaturation();
+    method public float getSaturationThreshold();
+    method public float[] toFloatArray();
+    method public int[] toRGB();
+    method public static cyanogenmod.hardware.HSIC unflattenFrom(java.lang.String) throws java.lang.NumberFormatException;
+    method public void writeToParcel(android.os.Parcel, int);
+  }
+
   public abstract interface IThermalListenerCallback implements android.os.IInterface {
     method public abstract void onThermalChanged(int) throws android.os.RemoteException;
   }
@@ -534,10 +555,11 @@ package cyanogenmod.hardware {
   }
 
   public class LiveDisplayConfig implements android.os.Parcelable {
-    ctor public LiveDisplayConfig(java.util.BitSet, int, int, int, boolean, boolean, boolean, boolean, android.util.Range<java.lang.Integer>, android.util.Range<java.lang.Integer>);
+    ctor public LiveDisplayConfig(java.util.BitSet, int, int, int, boolean, boolean, boolean, boolean, android.util.Range<java.lang.Integer>, android.util.Range<java.lang.Integer>, android.util.Range<java.lang.Float>, android.util.Range<java.lang.Float>, android.util.Range<java.lang.Float>, android.util.Range<java.lang.Float>, android.util.Range<java.lang.Float>);
     method public int describeContents();
     method public android.util.Range<java.lang.Integer> getColorBalanceRange();
     method public android.util.Range<java.lang.Integer> getColorTemperatureRange();
+    method public android.util.Range<java.lang.Float> getContrastRange();
     method public boolean getDefaultAutoContrast();
     method public boolean getDefaultAutoOutdoorMode();
     method public boolean getDefaultCABC();
@@ -545,6 +567,11 @@ package cyanogenmod.hardware {
     method public int getDefaultDayTemperature();
     method public int getDefaultMode();
     method public int getDefaultNightTemperature();
+    method public android.util.Range<java.lang.Float> getHueRange();
+    method public android.util.Range<java.lang.Float> getIntensityRange();
+    method public java.util.List<android.util.Range<java.lang.Float>> getPictureAdjustmentRanges();
+    method public android.util.Range<java.lang.Float> getSaturationRange();
+    method public android.util.Range<java.lang.Float> getSaturationThresholdRange();
     method public boolean hasFeature(int);
     method public boolean hasModeSupport();
     method public boolean isAvailable();
@@ -555,9 +582,11 @@ package cyanogenmod.hardware {
     method public float[] getColorAdjustment();
     method public cyanogenmod.hardware.LiveDisplayConfig getConfig();
     method public int getDayColorTemperature();
+    method public cyanogenmod.hardware.HSIC getDefaultPictureAdjustment();
     method public static synchronized cyanogenmod.hardware.LiveDisplayManager getInstance(android.content.Context);
     method public int getMode();
     method public int getNightColorTemperature();
+    method public cyanogenmod.hardware.HSIC getPictureAdjustment();
     method public boolean isAutoContrastEnabled();
     method public boolean isAutomaticOutdoorModeEnabled();
     method public boolean isCABCEnabled();
@@ -570,6 +599,11 @@ package cyanogenmod.hardware {
     method public boolean setDayColorTemperature(int);
     method public boolean setMode(int);
     method public boolean setNightColorTemperature(int);
+    method public boolean setPictureAdjustment(cyanogenmod.hardware.HSIC);
+    field public static final int ADJUSTMENT_CONTRAST = 3; // 0x3
+    field public static final int ADJUSTMENT_HUE = 0; // 0x0
+    field public static final int ADJUSTMENT_INTENSITY = 2; // 0x2
+    field public static final int ADJUSTMENT_SATURATION = 1; // 0x1
     field public static final int FEATURE_AUTO_CONTRAST = 11; // 0xb
     field public static final int FEATURE_CABC = 10; // 0xa
     field public static final int FEATURE_COLOR_ADJUSTMENT = 13; // 0xd
@@ -577,6 +611,7 @@ package cyanogenmod.hardware {
     field public static final int FEATURE_COLOR_ENHANCEMENT = 12; // 0xc
     field public static final int FEATURE_DISPLAY_MODES = 15; // 0xf
     field public static final int FEATURE_MANAGED_OUTDOOR_MODE = 14; // 0xe
+    field public static final int FEATURE_PICTURE_ADJUSTMENT = 17; // 0x11
     field public static final int MODE_AUTO = 2; // 0x2
     field public static final int MODE_DAY = 4; // 0x4
     field public static final int MODE_NIGHT = 1; // 0x1
@@ -639,6 +674,7 @@ package cyanogenmod.os {
     field public static final int DRAGON_FRUIT = 4; // 0x4
     field public static final int ELDERBERRY = 5; // 0x5
     field public static final int FIG = 6; // 0x6
+    field public static final int GUAVA = 7; // 0x7
   }
 
   public final class Concierge {
@@ -669,6 +705,7 @@ package cyanogenmod.platform {
     field public static final java.lang.String LIVE_LOCK_SCREEN_MANAGER_ACCESS = "cyanogenmod.permission.LIVE_LOCK_SCREEN_MANAGER_ACCESS";
     field public static final java.lang.String MANAGE_ALARMS = "cyanogenmod.permission.MANAGE_ALARMS";
     field public static final java.lang.String MANAGE_LIVEDISPLAY = "cyanogenmod.permission.MANAGE_LIVEDISPLAY";
+    field public static final java.lang.String MANAGE_PARTS = "cyanogenmod.permission.MANAGE_PARTS";
     field public static final java.lang.String MANAGE_PERSISTENT_STORAGE = "cyanogenmod.permission.MANAGE_PERSISTENT_STORAGE";
     field public static final java.lang.String MODIFY_MSIM_PHONE_STATE = "cyanogenmod.permission.MODIFY_MSIM_PHONE_STATE";
     field public static final java.lang.String MODIFY_NETWORK_SETTINGS = "cyanogenmod.permission.MODIFY_NETWORK_SETTINGS";
@@ -701,6 +738,12 @@ package cyanogenmod.platform {
 
   public static final class R.attr {
     ctor public R.attr();
+    field public static final int requiresConfig = 1057030148; // 0x3f010004
+    field public static final int requiresFeature = 1057030147; // 0x3f010003
+    field public static final int requiresOwner = 1057030150; // 0x3f010006
+    field public static final int requiresPackage = 1057030146; // 0x3f010002
+    field public static final int requiresProperty = 1057030149; // 0x3f010005
+    field public static final int xmlRes = 1057030151; // 0x3f010007
   }
 
   public static final class R.bool {
@@ -709,6 +752,10 @@ package cyanogenmod.platform {
 
   public static final class R.drawable {
     ctor public R.drawable();
+  }
+
+  public static final class R.id {
+    ctor public R.id();
   }
 
   public static final class R.integer {
@@ -740,6 +787,98 @@ package cyanogenmod.power {
     field public static final int PROFILE_HIGH_PERFORMANCE = 2; // 0x2
     field public static final int PROFILE_POWER_SAVE = 0; // 0x0
     field public static final java.lang.String TAG = "PerformanceManager";
+  }
+
+}
+
+package cyanogenmod.preference {
+
+  public class CMGlobalSettingSwitchPreference extends cyanogenmod.preference.SelfRemovingSwitchPreference {
+    ctor public CMGlobalSettingSwitchPreference(android.content.Context, android.util.AttributeSet, int);
+    ctor public CMGlobalSettingSwitchPreference(android.content.Context, android.util.AttributeSet);
+    ctor public CMGlobalSettingSwitchPreference(android.content.Context);
+    method protected boolean getPersistedBoolean(boolean);
+    method protected boolean isPersisted();
+    method protected boolean persistBoolean(boolean);
+  }
+
+  public class CMSecureSettingListPreference extends cyanogenmod.preference.SelfRemovingListPreference {
+    ctor public CMSecureSettingListPreference(android.content.Context, android.util.AttributeSet, int);
+    ctor public CMSecureSettingListPreference(android.content.Context, android.util.AttributeSet);
+    method public int getIntValue(int);
+    method protected java.lang.String getPersistedString(java.lang.String);
+    method protected boolean isPersisted();
+    method protected boolean persistString(java.lang.String);
+  }
+
+  public class CMSecureSettingSwitchPreference extends cyanogenmod.preference.SelfRemovingSwitchPreference {
+    ctor public CMSecureSettingSwitchPreference(android.content.Context, android.util.AttributeSet, int);
+    ctor public CMSecureSettingSwitchPreference(android.content.Context, android.util.AttributeSet);
+    ctor public CMSecureSettingSwitchPreference(android.content.Context);
+    method protected boolean getPersistedBoolean(boolean);
+    method protected boolean isPersisted();
+    method protected boolean persistBoolean(boolean);
+  }
+
+  public class CMSystemSettingListPreference extends cyanogenmod.preference.SelfRemovingListPreference {
+    ctor public CMSystemSettingListPreference(android.content.Context, android.util.AttributeSet, int);
+    ctor public CMSystemSettingListPreference(android.content.Context, android.util.AttributeSet);
+    method public int getIntValue(int);
+    method protected java.lang.String getPersistedString(java.lang.String);
+    method protected boolean isPersisted();
+    method protected boolean persistString(java.lang.String);
+  }
+
+  public class CMSystemSettingSwitchPreference extends cyanogenmod.preference.SelfRemovingSwitchPreference {
+    ctor public CMSystemSettingSwitchPreference(android.content.Context, android.util.AttributeSet, int);
+    ctor public CMSystemSettingSwitchPreference(android.content.Context, android.util.AttributeSet);
+    ctor public CMSystemSettingSwitchPreference(android.content.Context);
+    method protected boolean getPersistedBoolean(boolean);
+    method protected boolean isPersisted();
+    method protected boolean persistBoolean(boolean);
+  }
+
+  public class ConstraintsHelper {
+    ctor public ConstraintsHelper(android.content.Context, android.util.AttributeSet, Preference);
+    method public void applyConstraints();
+    method public static boolean hasSystemFeature(android.content.Context, java.lang.String);
+    method public static boolean isDozeAvailable(android.content.Context);
+    method public static boolean isPackageInstalled(android.content.Context, java.lang.String, boolean);
+    method public static boolean isVoiceCapable(android.content.Context);
+    method public void setAvailable(boolean);
+  }
+
+  public class SelfRemovingListPreference extends ListPreference {
+    ctor public SelfRemovingListPreference(android.content.Context, android.util.AttributeSet, int);
+    ctor public SelfRemovingListPreference(android.content.Context, android.util.AttributeSet);
+    ctor public SelfRemovingListPreference(android.content.Context);
+    method public void onBindViewHolder(PreferenceViewHolder);
+    method protected void setAvailable(boolean);
+  }
+
+  public class SelfRemovingPreference extends Preference {
+    ctor public SelfRemovingPreference(android.content.Context, android.util.AttributeSet, int);
+    ctor public SelfRemovingPreference(android.content.Context, android.util.AttributeSet);
+    ctor public SelfRemovingPreference(android.content.Context);
+    method public void onBindViewHolder(PreferenceViewHolder);
+    method protected void setAvailable(boolean);
+  }
+
+  public class SelfRemovingSwitchPreference extends SwitchPreference {
+    ctor public SelfRemovingSwitchPreference(android.content.Context, android.util.AttributeSet, int);
+    ctor public SelfRemovingSwitchPreference(android.content.Context, android.util.AttributeSet);
+    ctor public SelfRemovingSwitchPreference(android.content.Context);
+    method public void onBindViewHolder(PreferenceViewHolder);
+    method protected void setAvailable(boolean);
+  }
+
+  public class SystemSettingSwitchPreference extends cyanogenmod.preference.SelfRemovingSwitchPreference {
+    ctor public SystemSettingSwitchPreference(android.content.Context, android.util.AttributeSet, int);
+    ctor public SystemSettingSwitchPreference(android.content.Context, android.util.AttributeSet);
+    ctor public SystemSettingSwitchPreference(android.content.Context);
+    method protected boolean getPersistedBoolean(boolean);
+    method protected boolean isPersisted();
+    method protected boolean persistBoolean(boolean);
   }
 
 }
@@ -797,7 +936,7 @@ package cyanogenmod.profiles {
     field public static final int PROFILE_CONNECTION_SYNC = 5; // 0x5
     field public static final int PROFILE_CONNECTION_WIFI = 1; // 0x1
     field public static final int PROFILE_CONNECTION_WIFIAP = 2; // 0x2
-    field public static final int PROFILE_CONNECTION_WIMAX = 3; // 0x3
+    field public static final deprecated int PROFILE_CONNECTION_WIMAX = 3; // 0x3
   }
 
   public static class ConnectionSettings.BooleanState {
@@ -932,6 +1071,7 @@ package cyanogenmod.providers {
     field public static final java.lang.String DISPLAY_COLOR_ADJUSTMENT = "display_color_adjustment";
     field public static final java.lang.String DISPLAY_COLOR_ENHANCE = "display_color_enhance";
     field public static final deprecated java.lang.String DISPLAY_LOW_POWER = "display_low_power";
+    field public static final java.lang.String DISPLAY_PICTURE_ADJUSTMENT = "display_picture_adjustment";
     field public static final java.lang.String DISPLAY_TEMPERATURE_DAY = "display_temperature_day";
     field public static final java.lang.String DISPLAY_TEMPERATURE_MODE = "display_temperature_mode";
     field public static final java.lang.String DISPLAY_TEMPERATURE_NIGHT = "display_temperature_night";
@@ -990,6 +1130,7 @@ package cyanogenmod.providers {
     field public static final java.lang.String STATUS_BAR_QUICK_QS_PULLDOWN = "qs_quick_pulldown";
     field public static final java.lang.String STATUS_BAR_SHOW_BATTERY_PERCENT = "status_bar_show_battery_percent";
     field public static final java.lang.String STATUS_BAR_SHOW_WEATHER = "status_bar_show_weather";
+    field public static final java.lang.String STYLUS_ICON_ENABLED = "stylus_icon_enabled";
     field public static final java.lang.String SWAP_VOLUME_KEYS_ON_ROTATION = "swap_volume_keys_on_rotation";
     field public static final java.lang.String SYSTEM_PROFILES_ENABLED = "system_profiles_enabled";
     field public static final java.lang.String SYS_PROP_CM_SETTING_VERSION = "sys.cm_settings_system_version";
@@ -1105,6 +1246,26 @@ package cyanogenmod.providers {
     field public static final java.lang.String WALLPAPER_FULL = "wallpaper_full";
     field public static final java.lang.String WALLPAPER_PREVIEW = "wallpaper_preview";
     field public static final java.lang.String WALLPAPER_THUMBNAIL = "wallpaper_thumbnail";
+    field public static final java.lang.String _ID = "_id";
+  }
+
+  public static class ThemesContract.ThemeMixColumns {
+    ctor public ThemesContract.ThemeMixColumns();
+    field public static final android.net.Uri CONTENT_URI;
+    field public static final android.net.Uri PREVIEWS_URI;
+    field public static final java.lang.String TITLE = "title";
+    field public static final java.lang.String _ID = "_id";
+  }
+
+  public static class ThemesContract.ThemeMixEntryColumns {
+    ctor public ThemesContract.ThemeMixEntryColumns();
+    field public static final java.lang.String COMPONENT_ID = "component_id";
+    field public static final java.lang.String COMPONENT_TYPE = "component_type";
+    field public static final android.net.Uri CONTENT_URI;
+    field public static final java.lang.String IS_INSTALLED = "installed";
+    field public static final java.lang.String PACKAGE_NAME = "package_name";
+    field public static final java.lang.String THEME_MIX_ID = "theme_mix_id";
+    field public static final java.lang.String THEME_NAME = "theme_name";
     field public static final java.lang.String _ID = "_id";
   }
 

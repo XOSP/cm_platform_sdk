@@ -1152,6 +1152,16 @@ public final class CMSettings {
                 sBooleanValidator;
 
         /**
+         * Show icon when stylus is used
+         * The value is boolean (1 or 0).
+         */
+        public static final String STYLUS_ICON_ENABLED = "stylus_icon_enabled";
+
+        /** @hide */
+        public static final Validator STYLUS_ICON_ENABLED_VALIDATOR =
+                sBooleanValidator;
+
+        /**
          * Swap volume buttons when the screen is rotated
          * 0 - Disabled
          * 1 - Enabled (screen is rotated by 90 or 180 degrees: phone, hybrid)
@@ -1821,6 +1831,31 @@ public final class CMSettings {
                 sBooleanValidator;
 
         /**
+         * The current custom picture adjustment values as a delimited string
+         */
+        public static final String DISPLAY_PICTURE_ADJUSTMENT =
+                "display_picture_adjustment";
+
+        /** @hide */
+        public static final Validator DISPLAY_PICTURE_ADJUSTMENT_VALIDATOR =
+                new Validator() {
+                    @Override
+                    public boolean validate(String value) {
+                        if (TextUtils.isEmpty(value)) {
+                            return true;
+                        }
+                        final String[] sp = TextUtils.split(value, ",");
+                        for (String s : sp) {
+                            final String[] sp2 = TextUtils.split(s, ":");
+                            if (sp2.length != 2) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+                };
+
+        /**
          * I can haz more bukkits
          * @hide
          */
@@ -1857,6 +1892,7 @@ public final class CMSettings {
                 CMSettings.System.CAMERA_WAKE_SCREEN,
                 CMSettings.System.CAMERA_SLEEP_ON_RELEASE,
                 CMSettings.System.CAMERA_LAUNCH,
+                CMSettings.System.STYLUS_ICON_ENABLED,
                 CMSettings.System.SWAP_VOLUME_KEYS_ON_ROTATION,
                 CMSettings.System.BATTERY_LIGHT_ENABLED,
                 CMSettings.System.BATTERY_LIGHT_PULSE,
@@ -1893,7 +1929,6 @@ public final class CMSettings {
                 CMSettings.System.QS_SHOW_BRIGHTNESS_SLIDER,
                 CMSettings.System.STATUS_BAR_BRIGHTNESS_CONTROL,
                 CMSettings.System.VOLBTN_MUSIC_CONTROLS,
-                CMSettings.System.SWAP_VOLUME_KEYS_ON_ROTATION,
                 CMSettings.System.USE_EDGE_SERVICE_FOR_GESTURES,
                 CMSettings.System.STATUS_BAR_NOTIF_COUNT,
                 CMSettings.System.CALL_RECORDING_FORMAT,
@@ -2002,6 +2037,7 @@ public final class CMSettings {
             VALIDATORS.put(CAMERA_WAKE_SCREEN, CAMERA_WAKE_SCREEN_VALIDATOR);
             VALIDATORS.put(CAMERA_SLEEP_ON_RELEASE, CAMERA_SLEEP_ON_RELEASE_VALIDATOR);
             VALIDATORS.put(CAMERA_LAUNCH, CAMERA_LAUNCH_VALIDATOR);
+            VALIDATORS.put(STYLUS_ICON_ENABLED, STYLUS_ICON_ENABLED_VALIDATOR);
             VALIDATORS.put(SWAP_VOLUME_KEYS_ON_ROTATION,
                     SWAP_VOLUME_KEYS_ON_ROTATION_VALIDATOR);
             VALIDATORS.put(BATTERY_LIGHT_ENABLED, BATTERY_LIGHT_ENABLED_VALIDATOR);
@@ -2085,6 +2121,8 @@ public final class CMSettings {
             VALIDATORS.put(ZEN_PRIORITY_ALLOW_LIGHTS, ZEN_PRIORITY_ALLOW_LIGHTS_VALIDATOR);
             VALIDATORS.put(TOUCHSCREEN_GESTURE_HAPTIC_FEEDBACK,
                     TOUCHSCREEN_GESTURE_HAPTIC_FEEDBACK_VALIDATOR);
+            VALIDATORS.put(DISPLAY_PICTURE_ADJUSTMENT,
+                    DISPLAY_PICTURE_ADJUSTMENT_VALIDATOR);
             VALIDATORS.put(__MAGICAL_TEST_PASSING_ENABLER,
                     __MAGICAL_TEST_PASSING_ENABLER_VALIDATOR);
         };

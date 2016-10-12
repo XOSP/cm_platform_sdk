@@ -218,8 +218,19 @@
     <string name="permlab_observe_audio_sessions">observe audio session changes</string>
     <string name="permdesc_observe_audio_sessions">Allows an app to observe audio streams being created and destroyed.</string>
 
+    <!-- CMAudioService - observe session changes permission -->
+    <string name="permlab_manage_audio_sessions">manage audio session changes</string>
+    <string name="permdesc_manage_audio_sessions">Allows an app to send audio stream updates.</string>
+
     <!-- QuickSettings: Themes tile -->
     <string name="qs_themes_label">Themes</string>
     <string name="qs_themes_content_description">Customize your theme</string>
+
+    <!-- Privacy Guard -->
+    <string name="privacy_guard_manager_title">Privacy Guard</string>
+
+    <!-- Permissions used by CMParts -->
+    <string name="permlab_manageParts">manage remote settings</string>
+    <string name="permdesc_manageParts">Allows an app to manage CyanogenMod settings</string>
 
 </resources>

@@ -15,11 +15,6 @@
  */
 package org.cyanogenmod.platform.internal.display;
 
-import static cyanogenmod.hardware.LiveDisplayManager.MODE_AUTO;
-import static cyanogenmod.hardware.LiveDisplayManager.MODE_DAY;
-import static cyanogenmod.hardware.LiveDisplayManager.MODE_NIGHT;
-import static cyanogenmod.hardware.LiveDisplayManager.MODE_OFF;
-
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.content.Context;
@@ -31,7 +26,7 @@ import android.util.Range;
 import android.util.Slog;
 import android.view.animation.LinearInterpolator;
 
-import com.android.server.twilight.TwilightState;
+import org.cyanogenmod.platform.internal.display.TwilightTracker.TwilightState;
 
 import java.io.PrintWriter;
 import java.util.BitSet;
@@ -40,6 +35,11 @@ import cyanogenmod.hardware.CMHardwareManager;
 import cyanogenmod.hardware.LiveDisplayManager;
 import cyanogenmod.providers.CMSettings;
 import cyanogenmod.util.ColorUtils;
+
+import static cyanogenmod.hardware.LiveDisplayManager.MODE_AUTO;
+import static cyanogenmod.hardware.LiveDisplayManager.MODE_DAY;
+import static cyanogenmod.hardware.LiveDisplayManager.MODE_NIGHT;
+import static cyanogenmod.hardware.LiveDisplayManager.MODE_OFF;
 
 public class ColorTemperatureController extends LiveDisplayFeature {
 
@@ -299,12 +299,12 @@ public class ColorTemperatureController extends LiveDisplayFeature {
 
         if (now <= (sunset + TWILIGHT_ADJUSTMENT_TIME)) {
             return MathUtils.lerp(1.0f, 0.0f,
-                    (float)(now - sunset) / TWILIGHT_ADJUSTMENT_TIME);
+                    (float) (now - sunset) / TWILIGHT_ADJUSTMENT_TIME);
         }
 
         if (now >= sunrise) {
             return MathUtils.lerp(1.0f, 0.0f,
-                    (float)((sunrise + TWILIGHT_ADJUSTMENT_TIME) - now) / TWILIGHT_ADJUSTMENT_TIME);
+                    (float) ((sunrise + TWILIGHT_ADJUSTMENT_TIME) - now) / TWILIGHT_ADJUSTMENT_TIME);
         }
 
         return 0.0f;
@@ -323,7 +323,7 @@ public class ColorTemperatureController extends LiveDisplayFeature {
         if (twilight != null) {
             final long now = System.currentTimeMillis();
             adjustment = adj(now, twilight.getYesterdaySunset(), twilight.getTodaySunrise()) *
-                         adj(now, twilight.getTodaySunset(), twilight.getTomorrowSunrise());
+                    adj(now, twilight.getTodaySunset(), twilight.getTomorrowSunrise());
         }
 
         return (int)MathUtils.lerp(mNightTemperature, mDayTemperature, adjustment);

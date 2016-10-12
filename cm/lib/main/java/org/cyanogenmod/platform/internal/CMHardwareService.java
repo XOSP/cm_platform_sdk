@@ -20,7 +20,9 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
+import android.util.ArrayMap;
 import android.util.Log;
+import android.util.Range;
 
 import com.android.server.SystemService;
 
@@ -30,9 +32,12 @@ import cyanogenmod.hardware.CMHardwareManager;
 import cyanogenmod.hardware.DisplayMode;
 import cyanogenmod.hardware.IThermalListenerCallback;
 import cyanogenmod.hardware.ThermalListenerCallback;
+import cyanogenmod.hardware.HSIC;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.cyanogenmod.hardware.AdaptiveBacklight;
 import org.cyanogenmod.hardware.AutoContrast;
@@ -45,6 +50,7 @@ import org.cyanogenmod.hardware.HighTouchSensitivity;
 import org.cyanogenmod.hardware.KeyDisabler;
 import org.cyanogenmod.hardware.LongTermOrbits;
 import org.cyanogenmod.hardware.PersistentStorage;
+import org.cyanogenmod.hardware.PictureAdjustment;
 import org.cyanogenmod.hardware.SerialNumber;
 import org.cyanogenmod.hardware.SunlightEnhancement;
 import org.cyanogenmod.hardware.TapToWake;
@@ -64,6 +70,10 @@ public class CMHardwareService extends CMSystemService implements ThermalUpdateC
     private final CMHardwareInterface mCmHwImpl;
     private int mCurrentThermalState = ThermalListenerCallback.State.STATE_UNKNOWN;
     private RemoteCallbackList<IThermalListenerCallback> mRemoteCallbackList;
+
+    private final ArrayMap<String, String> mDisplayModeMappings =
+            new ArrayMap<String, String>();
+    private final boolean mFilterDisplayModes;
 
     private interface CMHardwareInterface {
         public int getSupportedFeatures();
@@ -102,6 +112,11 @@ public class CMHardwareService extends CMSystemService implements ThermalUpdateC
         public int getColorBalanceMax();
         public int getColorBalance();
         public boolean setColorBalance(int value);
+
+        public HSIC getPictureAdjustment();
+        public HSIC getDefaultPictureAdjustment();
+        public boolean setPictureAdjustment(HSIC hsic);
+        public List<Range<Float>> getPictureAdjustmentRanges();
     }
 
     private class LegacyCMHardware implements CMHardwareInterface {
@@ -145,6 +160,8 @@ public class CMHardwareService extends CMSystemService implements ThermalUpdateC
                 mSupportedFeatures |= CMHardwareManager.FEATURE_UNIQUE_DEVICE_ID;
             if (ColorBalance.isSupported())
                 mSupportedFeatures |= CMHardwareManager.FEATURE_COLOR_BALANCE;
+            if (PictureAdjustment.isSupported())
+                mSupportedFeatures |= CMHardwareManager.FEATURE_PICTURE_ADJUSTMENT;
         }
 
         public int getSupportedFeatures() {
@@ -358,6 +375,21 @@ public class CMHardwareService extends CMSystemService implements ThermalUpdateC
         public boolean setColorBalance(int value) {
             return ColorBalance.setValue(value);
         }
+
+        public HSIC getPictureAdjustment() { return PictureAdjustment.getHSIC(); }
+
+        public HSIC getDefaultPictureAdjustment() { return PictureAdjustment.getDefaultHSIC(); }
+
+        public boolean setPictureAdjustment(HSIC hsic) { return PictureAdjustment.setHSIC(hsic); }
+
+        public List<Range<Float>> getPictureAdjustmentRanges() {
+            return Arrays.asList(
+                    PictureAdjustment.getHueRange(),
+                    PictureAdjustment.getSaturationRange(),
+                    PictureAdjustment.getIntensityRange(),
+                    PictureAdjustment.getContrastRange(),
+                    PictureAdjustment.getSaturationThresholdRange());
+        }
     }
 
     private CMHardwareInterface getImpl(Context context) {
@@ -369,6 +401,19 @@ public class CMHardwareService extends CMSystemService implements ThermalUpdateC
         mContext = context;
         mCmHwImpl = getImpl(context);
         publishBinderService(CMContextConstants.CM_HARDWARE_SERVICE, mService);
+
+        final String[] mappings = mContext.getResources().getStringArray(
+                org.cyanogenmod.platform.internal.R.array.config_displayModeMappings);
+        if (mappings != null && mappings.length > 0) {
+            for (String mapping : mappings) {
+                String[] split = mapping.split(":");
+                if (split.length == 2) {
+                    mDisplayModeMappings.put(split[0], split[1]);
+                }
+            }
+        }
+        mFilterDisplayModes = mContext.getResources().getBoolean(
+                org.cyanogenmod.platform.internal.R.bool.config_filterDisplayModes);
     }
 
     @Override
@@ -408,6 +453,19 @@ public class CMHardwareService extends CMSystemService implements ThermalUpdateC
             }
         }
         mRemoteCallbackList.finishBroadcast();
+    }
+
+    private DisplayMode remapDisplayMode(DisplayMode in) {
+        if (in == null) {
+            return null;
+        }
+        if (mDisplayModeMappings.containsKey(in.name)) {
+            return new DisplayMode(in.id, mDisplayModeMappings.get(in.name));
+        }
+        if (!mFilterDisplayModes) {
+            return in;
+        }
+        return null;
     }
 
     private final IBinder mService = new ICMHardwareService.Stub() {
@@ -611,7 +669,18 @@ public class CMHardwareService extends CMSystemService implements ThermalUpdateC
                 Log.e(TAG, "Display modes are not supported");
                 return null;
             }
-            return mCmHwImpl.getDisplayModes();
+            final DisplayMode[] modes = mCmHwImpl.getDisplayModes();
+            if (modes == null) {
+                return null;
+            }
+            final ArrayList<DisplayMode> remapped = new ArrayList<DisplayMode>();
+            for (DisplayMode mode : modes) {
+                DisplayMode r = remapDisplayMode(mode);
+                if (r != null) {
+                    remapped.add(r);
+                }
+            }
+            return remapped.toArray(new DisplayMode[remapped.size()]);
         }
 
         @Override
@@ -622,7 +691,7 @@ public class CMHardwareService extends CMSystemService implements ThermalUpdateC
                 Log.e(TAG, "Display modes are not supported");
                 return null;
             }
-            return mCmHwImpl.getCurrentDisplayMode();
+            return remapDisplayMode(mCmHwImpl.getCurrentDisplayMode());
         }
 
         @Override
@@ -633,7 +702,7 @@ public class CMHardwareService extends CMSystemService implements ThermalUpdateC
                 Log.e(TAG, "Display modes are not supported");
                 return null;
             }
-            return mCmHwImpl.getDefaultDisplayMode();
+            return remapDisplayMode(mCmHwImpl.getDefaultDisplayMode());
         }
 
         @Override
@@ -750,6 +819,52 @@ public class CMHardwareService extends CMSystemService implements ThermalUpdateC
                 return mCmHwImpl.setColorBalance(value);
             }
             return false;
+        }
+
+        @Override
+        public HSIC getPictureAdjustment() {
+            mContext.enforceCallingOrSelfPermission(
+                    cyanogenmod.platform.Manifest.permission.HARDWARE_ABSTRACTION_ACCESS, null);
+            if (isSupported(CMHardwareManager.FEATURE_PICTURE_ADJUSTMENT)) {
+                return mCmHwImpl.getPictureAdjustment();
+            }
+            return new HSIC(0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+        }
+
+        @Override
+        public HSIC getDefaultPictureAdjustment() {
+            mContext.enforceCallingOrSelfPermission(
+                    cyanogenmod.platform.Manifest.permission.HARDWARE_ABSTRACTION_ACCESS, null);
+            if (isSupported(CMHardwareManager.FEATURE_PICTURE_ADJUSTMENT)) {
+                return mCmHwImpl.getDefaultPictureAdjustment();
+            }
+            return new HSIC(0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+        }
+
+        @Override
+        public boolean setPictureAdjustment(HSIC hsic) {
+            mContext.enforceCallingOrSelfPermission(
+                    cyanogenmod.platform.Manifest.permission.HARDWARE_ABSTRACTION_ACCESS, null);
+            if (isSupported(CMHardwareManager.FEATURE_PICTURE_ADJUSTMENT) && hsic != null) {
+                return mCmHwImpl.setPictureAdjustment(hsic);
+            }
+            return false;
+        }
+
+        @Override
+        public float[] getPictureAdjustmentRanges() {
+            mContext.enforceCallingOrSelfPermission(
+                    cyanogenmod.platform.Manifest.permission.HARDWARE_ABSTRACTION_ACCESS, null);
+            if (isSupported(CMHardwareManager.FEATURE_COLOR_BALANCE)) {
+                final List<Range<Float>> r = mCmHwImpl.getPictureAdjustmentRanges();
+                return new float[] {
+                        r.get(0).getLower(), r.get(0).getUpper(),
+                        r.get(1).getLower(), r.get(1).getUpper(),
+                        r.get(2).getLower(), r.get(2).getUpper(),
+                        r.get(3).getLower(), r.get(3).getUpper(),
+                        r.get(4).getUpper(), r.get(4).getUpper() };
+            }
+            return new float[10];
         }
     };
 }

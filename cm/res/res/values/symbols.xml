@@ -15,9 +15,7 @@
      limitations under the License.
 -->
 <resources>
-    <!-- We don't want to publish private symbols in cyanogenmod.R as part of the
-         SDK.  Instead, put them here. -->
-    <private-symbols package="org.cyanogenmod.platform.internal" />
+    <java-symbol type="drawable" name="ic_launcher_cyanogenmod" />
 
     <java-symbol type="bool" name="config_enableAppSuggestOverlay"/>
     <java-symbol type="string" name="config_appSuggestProviderPackageName"/>
@@ -72,6 +70,7 @@
     <java-symbol type="integer" name="config_dayColorTemperature" />
     <java-symbol type="integer" name="config_nightColorTemperature" />
     <java-symbol type="integer" name="config_outdoorAmbientLux" />
+    <java-symbol type="integer" name="config_outdoorAmbientLuxHysteresis" />
     <java-symbol type="integer" name="config_defaultLiveDisplayMode" />
     <java-symbol type="integer" name="config_minColorTemperature" />
     <java-symbol type="integer" name="config_maxColorTemperature" />
@@ -80,6 +79,9 @@
     <java-symbol type="bool" name="config_defaultAutoOutdoorMode" />
     <java-symbol type="bool" name="config_defaultColorEnhancement" />
     <java-symbol type="bool" name="config_defaultCABC" />
+
+    <java-symbol type="bool" name="config_filterDisplayModes" />
+    <java-symbol type="array" name="config_displayModeMappings" />
 
     <!-- Notification and battery light -->
     <java-symbol type="bool" name="config_adjustableNotificationLedBrightness" />
@@ -124,4 +126,7 @@
 
     <!-- CM system server -->
     <java-symbol type="string" name="config_externalSystemServer" />
+
+    <!-- Settings -->
+    <java-symbol type="string" name="privacy_guard_manager_title" />
 </resources>

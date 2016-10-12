@@ -23,8 +23,8 @@ LOCAL_PATH := $(call my-dir)
 # R.java file as a prerequisite.
 cm_platform_res := APPS/org.cyanogenmod.platform-res_intermediates/src
 
-# List of packages used in cm-api-stubs and cm-system-api-stubs
-cm_stub_packages := cyanogenmod.alarmclock:cyanogenmod.app:cyanogenmod.content:cyanogenmod.externalviews:cyanogenmod.hardware:cyanogenmod.media:cyanogenmod.os:cyanogenmod.profiles:cyanogenmod.providers:cyanogenmod.platform:cyanogenmod.power:cyanogenmod.themes:cyanogenmod.util:cyanogenmod.weather:cyanogenmod.weatherservice
+# List of packages used in cm-api-stubs
+cm_stub_packages := cyanogenmod.alarmclock:cyanogenmod.app:cyanogenmod.content:cyanogenmod.externalviews:cyanogenmod.hardware:cyanogenmod.media:cyanogenmod.os:cyanogenmod.preference:cyanogenmod.profiles:cyanogenmod.providers:cyanogenmod.platform:cyanogenmod.power:cyanogenmod.themes:cyanogenmod.util:cyanogenmod.weather:cyanogenmod.weatherservice
 
 # The CyanogenMod Platform Framework Library
 # ============================================================
@@ -37,9 +37,14 @@ library_src := cm/lib/main/java
 LOCAL_MODULE := org.cyanogenmod.platform
 LOCAL_MODULE_TAGS := optional
 
+cmsdk_LOCAL_JAVA_LIBRARIES := \
+    android-support-v7-preference \
+    android-support-v14-preference
+
 LOCAL_JAVA_LIBRARIES := \
     services \
-    org.cyanogenmod.hardware
+    org.cyanogenmod.hardware \
+    $(cmsdk_LOCAL_JAVA_LIBRARIES)
 
 LOCAL_SRC_FILES := \
     $(call all-java-files-under, $(cyanogenmod_sdk_src)) \
@@ -111,8 +116,7 @@ LOCAL_REQUIRED_MODULES := services
 
 LOCAL_SRC_FILES := \
     $(call all-java-files-under, $(cyanogenmod_sdk_src)) \
-    $(call all-Iaidl-files-under, $(cyanogenmod_sdk_src)) \
-    $(call all-Iaidl-files-under, $(cyanogenmod_sdk_internal_src))
+    $(call all-Iaidl-files-under, $(cyanogenmod_sdk_src))
 
 # Included aidl files from cyanogenmod.app namespace
 LOCAL_AIDL_INCLUDES := $(LOCAL_PATH)/sdk/src/java
@@ -123,6 +127,9 @@ cmsdk_LOCAL_INTERMEDIATE_SOURCES := \
 
 LOCAL_INTERMEDIATE_SOURCES := \
     $(cmsdk_LOCAL_INTERMEDIATE_SOURCES)
+
+LOCAL_JAVA_LIBRARIES := \
+    $(cmsdk_LOCAL_JAVA_LIBRARIES)
 
 # Make sure that R.java and Manifest.java are built before we build
 # the source for this library.
@@ -185,6 +192,9 @@ cmsdk_LOCAL_INTERMEDIATE_SOURCES := \
 LOCAL_INTERMEDIATE_SOURCES := \
     $(cmsdk_LOCAL_INTERMEDIATE_SOURCES)
 
+LOCAL_JAVA_LIBRARIES := \
+    $(cmsdk_LOCAL_JAVA_LIBRARIES)
+
 $(full_target): $(cm_framework_built) $(gen)
 include $(BUILD_STATIC_JAVA_LIBRARY)
 
@@ -199,17 +209,17 @@ cmplat_docs_java_libraries := \
     org.cyanogenmod.platform.sdk
 
 # SDK version as defined
-cmplat_docs_SDK_VERSION := 13.0
+cmplat_docs_SDK_VERSION := 14.0
 
 # release version
-cmplat_docs_SDK_REL_ID := 6
+cmplat_docs_SDK_REL_ID := 7
 
 cmplat_docs_LOCAL_MODULE_CLASS := JAVA_LIBRARIES
 
 cmplat_docs_LOCAL_DROIDDOC_SOURCE_PATH := \
     $(cmplat_docs_src_files)
 
-intermediates.COMMON := $(call intermediates-dir-for,$(LOCAL_MODULE_CLASS), org.cyanogenmod.platform.sdk,,COMMON)
+intermediates.COMMON := $(call intermediates-dir-for,$(LOCAL_MODULE_CLASS),org.cyanogenmod.platform.sdk,,COMMON)
 
 # ====  the api stubs and current.xml ===========================
 include $(CLEAR_VARS)
@@ -244,38 +254,6 @@ $(full_target): $(cm_framework_built) $(gen)
 $(INTERNAL_CM_PLATFORM_API_FILE): $(full_target)
 $(call dist-for-goals,sdk,$(INTERNAL_CM_PLATFORM_API_FILE))
 
-# ====  the system api stubs ===================================
-include $(CLEAR_VARS)
-
-LOCAL_SRC_FILES:= \
-    $(cmplat_docs_src_files)
-LOCAL_INTERMEDIATE_SOURCES:= $(cmplat_LOCAL_INTERMEDIATE_SOURCES)
-LOCAL_JAVA_LIBRARIES:= $(cmplat_docs_java_libraries)
-LOCAL_MODULE_CLASS:= $(cmplat_docs_LOCAL_MODULE_CLASS)
-LOCAL_DROIDDOC_SOURCE_PATH:= $(cmplat_docs_LOCAL_DROIDDOC_SOURCE_PATH)
-LOCAL_ADDITIONAL_JAVA_DIR:= $(intermediates.COMMON)/src
-
-LOCAL_MODULE := cm-system-api-stubs
-
-LOCAL_DROIDDOC_OPTIONS:=\
-        -stubs $(TARGET_OUT_COMMON_INTERMEDIATES)/JAVA_LIBRARIES/cmsdk_system_stubs_current_intermediates/src \
-        -stubpackages $(cm_stub_packages) \
-        -showAnnotation android.annotation.SystemApi \
-        -exclude org.cyanogenmod.platform.internal \
-        -api $(INTERNAL_CM_PLATFORM_SYSTEM_API_FILE) \
-        -removedApi $(INTERNAL_CM_PLATFORM_SYSTEM_REMOVED_API_FILE) \
-        -nodocs
-
-LOCAL_DROIDDOC_CUSTOM_TEMPLATE_DIR:= build/tools/droiddoc/templates-sdk
-
-LOCAL_UNINSTALLABLE_MODULE := true
-
-include $(BUILD_DROIDDOC)
-
-# $(gen), i.e. framework.aidl, is also needed while building against the current stub.
-$(full_target): $(cm_framework_built) $(gen)
-$(INTERNAL_CM_PLATFORM_API_FILE): $(full_target)
-$(call dist-for-goals,sdk,$(INTERNAL_CM_PLATFORM_API_FILE))
 
 # Documentation
 # ===========================================================
@@ -310,7 +288,8 @@ LOCAL_DROIDDOC_OPTIONS := \
         -since $(CM_SRC_API_DIR)/3.txt 3 \
         -since $(CM_SRC_API_DIR)/4.txt 4 \
         -since $(CM_SRC_API_DIR)/5.txt 5 \
-        -since $(CM_SRC_API_DIR)/6.txt 6
+        -since $(CM_SRC_API_DIR)/6.txt 6 \
+        -since $(CM_SRC_API_DIR)/7.txt 7
 
 $(full_target): $(cm_framework_built) $(gen)
 include $(BUILD_DROIDDOC)
