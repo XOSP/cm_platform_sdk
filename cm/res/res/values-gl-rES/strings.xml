@@ -86,6 +86,12 @@
   <string name="perf_profile_perf">Rendemento</string>
   <string name="perf_profile_bias_power">Eficiencia</string>
   <string name="perf_profile_bias_perf">Veloz</string>
+  <!-- Performance profiles -->
+  <string name="perf_profile_pwrsv_summary">Aforro de enerxía máximo. Reduce o rendemento do dispositivo, desactiva as tarefas e datos en segundo plano, desactiva as animacións e reduce o taxa de refresco da pantalla</string>
+  <string name="perf_profile_bal_summary">Equilibrio entre un rendemento óptimo e características de aforro de enerxía</string>
+  <string name="perf_profile_perf_summary">Modo de alto rendemento. Útil para as aplicacións que requiren dunha baixa latencia e o un gran rendemento cando o consumo de enerxía non é unha preocupación</string>
+  <string name="perf_profile_bias_power_summary">Favorece o aforro de enerxía. Limita o rendemento máximo da CPU e a optimiza para poder aforrar perante unha maior latencia</string>
+  <string name="perf_profile_bias_perf_summary">Favorece o rendemento. Reduce a latencia cun consumo lixeiramente máis alto</string>
   <!-- LiveDisplay strings -->
   <string name="live_display_auto">Automático</string>
   <string name="live_display_auto_summary">Axustar automaticamente as cores de pantalla ao mencer e ao solpor</string>
@@ -184,12 +190,9 @@
   <!-- QuickSettings: Themes tile -->
   <string name="qs_themes_label">Temas</string>
   <string name="qs_themes_content_description">Personalice o seu tema</string>
-  <!-- Custom booot dexopt -->
-  <string name="android_upgrading_starting_apps">Iniciando as aplicacións\u2026</string>
-  <string name="android_upgrading_fstrim">Optimizando o almacenamento\u2026</string>
-  <string name="android_upgrading_complete">Preparando para iniciar\u2026</string>
-  <string name="android_upgrading_complete_details">Optimización completada.</string>
-  <string name="android_preparing_apk">Preparando %1$s\u2026</string>
-  <string name="android_preparing_apk_obscured">Preparando aplicacións\u2026</string>
-  <string name="android_upgrading_apk">%1$d de %2$d aplicacións</string>
+  <!-- Privacy Guard -->
+  <string name="privacy_guard_manager_title">Proteción da Privacidade</string>
+  <!-- Permissions used by remote preferences -->
+  <string name="permlab_manageRemotePrefs">xestionar axustes remotos</string>
+  <string name="permdesc_manageRemotePrefs">Permitir a unha aplicación xestionar os axustes remotos</string>
 </resources>
